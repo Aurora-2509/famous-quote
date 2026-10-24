@@ -1,0 +1,628 @@
+import json
+import os
+
+quotes = [
+    # 1 - 10: Science & Technology
+    {
+        "id": 1,
+        "quote": "The only way to do great work is to love what you do.",
+        "author": "Steve Jobs",
+        "category": "Science & Technology"
+    },
+    {
+        "id": 2,
+        "quote": "Imagination is more important than knowledge. For knowledge is limited, whereas imagination embraces the entire world.",
+        "author": "Albert Einstein",
+        "category": "Science & Technology"
+    },
+    {
+        "id": 3,
+        "quote": "If I have seen further it is by standing on the shoulders of Giants.",
+        "author": "Isaac Newton",
+        "category": "Science & Technology"
+    },
+    {
+        "id": 4,
+        "quote": "Nothing in life is to be feared, it is only to be understood. Now is the time to understand more, so that we may fear less.",
+        "author": "Marie Curie",
+        "category": "Science & Technology"
+    },
+    {
+        "id": 5,
+        "quote": "Somewhere, something incredible is waiting to be known.",
+        "author": "Carl Sagan",
+        "category": "Science & Technology"
+    },
+    {
+        "id": 6,
+        "quote": "The present is theirs; the future, for which I really worked, is mine.",
+        "author": "Nikola Tesla",
+        "category": "Science & Technology"
+    },
+    {
+        "id": 7,
+        "quote": "I think it is possible for ordinary people to choose to be extraordinary.",
+        "author": "Elon Musk",
+        "category": "Science & Technology"
+    },
+    {
+        "id": 8,
+        "quote": "We can only see a short distance ahead, but we can see plenty there that needs to be done.",
+        "author": "Alan Turing",
+        "category": "Science & Technology"
+    },
+    {
+        "id": 9,
+        "quote": "The first principle is that you must not fool yourself and you are the easiest person to fool.",
+        "author": "Richard Feynman",
+        "category": "Science & Technology"
+    },
+    {
+        "id": 10,
+        "quote": "Look up at the stars and not down at your feet. Try to make sense of what you see, and wonder about what makes the universe exist.",
+        "author": "Stephen Hawking",
+        "category": "Science & Technology"
+    },
+
+    # 11 - 22: Wisdom & Philosophy
+    {
+        "id": 11,
+        "quote": "The unexamined life is not worth living.",
+        "author": "Socrates",
+        "category": "Wisdom & Philosophy"
+    },
+    {
+        "id": 12,
+        "quote": "We are what we repeatedly do. Excellence, then, is not an act, but a habit.",
+        "author": "Aristotle",
+        "category": "Wisdom & Philosophy"
+    },
+    {
+        "id": 13,
+        "quote": "The journey of a thousand miles begins with a single step.",
+        "author": "Lao Tzu",
+        "category": "Wisdom & Philosophy"
+    },
+    {
+        "id": 14,
+        "quote": "It does not matter how slowly you go as long as you do not stop.",
+        "author": "Confucius",
+        "category": "Wisdom & Philosophy"
+    },
+    {
+        "id": 15,
+        "quote": "You have power over your mind - not outside events. Realize this, and you will find strength.",
+        "author": "Marcus Aurelius",
+        "category": "Wisdom & Philosophy"
+    },
+    {
+        "id": 16,
+        "quote": "He who has a why to live can bear almost any how.",
+        "author": "Friedrich Nietzsche",
+        "category": "Wisdom & Philosophy"
+    },
+    {
+        "id": 17,
+        "quote": "I think, therefore I am.",
+        "author": "René Descartes",
+        "category": "Wisdom & Philosophy"
+    },
+    {
+        "id": 18,
+        "quote": "Judge a man by his questions rather than by his answers.",
+        "author": "Voltaire",
+        "category": "Wisdom & Philosophy"
+    },
+    {
+        "id": 19,
+        "quote": "In the depth of winter, I finally learned that within me there lay an invincible summer.",
+        "author": "Albert Camus",
+        "category": "Wisdom & Philosophy"
+    },
+    {
+        "id": 20,
+        "quote": "The only true wisdom is in knowing you know nothing.",
+        "author": "Socrates",
+        "category": "Wisdom & Philosophy"
+    },
+    {
+        "id": 21,
+        "quote": "Knowing yourself is the beginning of all wisdom.",
+        "author": "Aristotle",
+        "category": "Wisdom & Philosophy"
+    },
+    {
+        "id": 22,
+        "quote": "Waste no more time arguing what a good man should be. Be one.",
+        "author": "Marcus Aurelius",
+        "category": "Wisdom & Philosophy"
+    },
+
+    # 23 - 35: Inspiration & Motivation
+    {
+        "id": 23,
+        "quote": "You will face many defeats in life, but never let yourself be defeated.",
+        "author": "Maya Angelou",
+        "category": "Inspiration"
+    },
+    {
+        "id": 24,
+        "quote": "The future belongs to those who believe in the beauty of their dreams.",
+        "author": "Eleanor Roosevelt",
+        "category": "Inspiration"
+    },
+    {
+        "id": 25,
+        "quote": "The way to get started is to quit talking and begin doing.",
+        "author": "Walt Disney",
+        "category": "Inspiration"
+    },
+    {
+        "id": 26,
+        "quote": "What lies behind us and what lies before us are tiny matters compared to what lies within us.",
+        "author": "Ralph Waldo Emerson",
+        "category": "Inspiration"
+    },
+    {
+        "id": 27,
+        "quote": "Act as if what you do makes a difference. It does.",
+        "author": "William James",
+        "category": "Inspiration"
+    },
+    {
+        "id": 28,
+        "quote": "Believe you can and you're halfway there.",
+        "author": "Theodore Roosevelt",
+        "category": "Inspiration"
+    },
+    {
+        "id": 29,
+        "quote": "Spread love everywhere you go. Let no one ever come to you without leaving happier.",
+        "author": "Mother Teresa",
+        "category": "Inspiration"
+    },
+    {
+        "id": 30,
+        "quote": "Do what you can, with what you have, where you are.",
+        "author": "Theodore Roosevelt",
+        "category": "Inspiration"
+    },
+    {
+        "id": 31,
+        "quote": "When you have a dream, you've got to grab it and never let go.",
+        "author": "Carol Burnett",
+        "category": "Inspiration"
+    },
+    {
+        "id": 32,
+        "quote": "It is never too late to be what you might have been.",
+        "author": "George Eliot",
+        "category": "Inspiration"
+    },
+    {
+        "id": 33,
+        "quote": "Keep your face always toward the sunshine—and shadows will fall behind you.",
+        "author": "Walt Whitman",
+        "category": "Inspiration"
+    },
+    {
+        "id": 34,
+        "quote": "You define your own life. Don't let other people write your script.",
+        "author": "Oprah Winfrey",
+        "category": "Inspiration"
+    },
+    {
+        "id": 35,
+        "quote": "Try to be a rainbow in someone's cloud.",
+        "author": "Maya Angelou",
+        "category": "Inspiration"
+    },
+
+    # 36 - 47: Courage & Resilience
+    {
+        "id": 36,
+        "quote": "Success is not final, failure is not fatal: it is the courage to continue that counts.",
+        "author": "Winston Churchill",
+        "category": "Courage & Resilience"
+    },
+    {
+        "id": 37,
+        "quote": "Darkness cannot drive out darkness; only light can do that. Hate cannot drive out hate; only love can do that.",
+        "author": "Martin Luther King Jr.",
+        "category": "Courage & Resilience"
+    },
+    {
+        "id": 38,
+        "quote": "Although the world is full of suffering, it is also full of the overcoming of it.",
+        "author": "Helen Keller",
+        "category": "Courage & Resilience"
+    },
+    {
+        "id": 39,
+        "quote": "One child, one teacher, one book, one pen can change the world.",
+        "author": "Malala Yousafzai",
+        "category": "Courage & Resilience"
+    },
+    {
+        "id": 40,
+        "quote": "I learned that courage was not the absence of fear, but the triumph over it.",
+        "author": "Nelson Mandela",
+        "category": "Courage & Resilience"
+    },
+    {
+        "id": 41,
+        "quote": "If you're going through hell, keep going.",
+        "author": "Winston Churchill",
+        "category": "Courage & Resilience"
+    },
+    {
+        "id": 42,
+        "quote": "Our greatest glory is not in never falling, but in rising every time we fall.",
+        "author": "Confucius",
+        "category": "Courage & Resilience"
+    },
+    {
+        "id": 43,
+        "quote": "Courage is grace under pressure.",
+        "author": "Ernest Hemingway",
+        "category": "Courage & Resilience"
+    },
+    {
+        "id": 44,
+        "quote": "It is during our darkest moments that we must focus to see the light.",
+        "author": "Aristotle Onassis",
+        "category": "Courage & Resilience"
+    },
+    {
+        "id": 45,
+        "quote": "You may have to fight a battle more than once to win it.",
+        "author": "Margaret Thatcher",
+        "category": "Courage & Resilience"
+    },
+    {
+        "id": 46,
+        "quote": "Strength does not come from winning. Your struggles develop your strengths.",
+        "author": "Arnold Schwarzenegger",
+        "category": "Courage & Resilience"
+    },
+    {
+        "id": 47,
+        "quote": "Turn your wounds into wisdom.",
+        "author": "Oprah Winfrey",
+        "category": "Courage & Resilience"
+    },
+
+    # 48 - 60: Success & Ambition
+    {
+        "id": 48,
+        "quote": "Whether you think you can, or you think you can't – you're right.",
+        "author": "Henry Ford",
+        "category": "Success & Ambition"
+    },
+    {
+        "id": 49,
+        "quote": "I have not failed. I've just found 10,000 ways that won't work.",
+        "author": "Thomas Edison",
+        "category": "Success & Ambition"
+    },
+    {
+        "id": 50,
+        "quote": "Success usually comes to those who are too busy to be looking for it.",
+        "author": "Henry David Thoreau",
+        "category": "Success & Ambition"
+    },
+    {
+        "id": 51,
+        "quote": "Opportunities don't happen. You create them.",
+        "author": "Chris Grosser",
+        "category": "Success & Ambition"
+    },
+    {
+        "id": 52,
+        "quote": "Don't be afraid to give up the good to go for the great.",
+        "author": "John D. Rockefeller",
+        "category": "Success & Ambition"
+    },
+    {
+        "id": 53,
+        "quote": "I find that the harder I work, the more luck I seem to have.",
+        "author": "Thomas Jefferson",
+        "category": "Success & Ambition"
+    },
+    {
+        "id": 54,
+        "quote": "There are no secrets to success. It is the result of preparation, hard work, and learning from failure.",
+        "author": "Colin Powell",
+        "category": "Success & Ambition"
+    },
+    {
+        "id": 55,
+        "quote": "The secret of getting ahead is getting started.",
+        "author": "Mark Twain",
+        "category": "Success & Ambition"
+    },
+    {
+        "id": 56,
+        "quote": "It always seems impossible until it's done.",
+        "author": "Nelson Mandela",
+        "category": "Success & Ambition"
+    },
+    {
+        "id": 57,
+        "quote": "Never let the fear of striking out keep you from playing the game.",
+        "author": "Babe Ruth",
+        "category": "Success & Ambition"
+    },
+    {
+        "id": 58,
+        "quote": "The road to success and the road to failure are almost exactly the same.",
+        "author": "Colin R. Davis",
+        "category": "Success & Ambition"
+    },
+    {
+        "id": 59,
+        "quote": "Success is walking from failure to failure with no loss of enthusiasm.",
+        "author": "Winston Churchill",
+        "category": "Success & Ambition"
+    },
+    {
+        "id": 60,
+        "quote": "Action is the foundational key to all success.",
+        "author": "Pablo Picasso",
+        "category": "Success & Ambition"
+    },
+
+    # 61 - 72: Life & Happiness
+    {
+        "id": 61,
+        "quote": "Life is what happens when you're busy making other plans.",
+        "author": "John Lennon",
+        "category": "Life & Happiness"
+    },
+    {
+        "id": 62,
+        "quote": "In three words I can sum up everything I've learned about life: it goes on.",
+        "author": "Robert Frost",
+        "category": "Life & Happiness"
+    },
+    {
+        "id": 63,
+        "quote": "The purpose of our lives is to be happy.",
+        "author": "Dalai Lama",
+        "category": "Life & Happiness"
+    },
+    {
+        "id": 64,
+        "quote": "Life is really simple, but we insist on making it complicated.",
+        "author": "Confucius",
+        "category": "Life & Happiness"
+    },
+    {
+        "id": 65,
+        "quote": "To live is the rarest thing in the world. Most people exist, that is all.",
+        "author": "Oscar Wilde",
+        "category": "Life & Happiness"
+    },
+    {
+        "id": 66,
+        "quote": "Live in the sunshine, swim the sea, drink the wild air.",
+        "author": "Ralph Waldo Emerson",
+        "category": "Life & Happiness"
+    },
+    {
+        "id": 67,
+        "quote": "Not how long, but how well you have lived is the main thing.",
+        "author": "Seneca",
+        "category": "Life & Happiness"
+    },
+    {
+        "id": 68,
+        "quote": "Happiness is not something readymade. It comes from your own actions.",
+        "author": "Dalai Lama",
+        "category": "Life & Happiness"
+    },
+    {
+        "id": 69,
+        "quote": "Be happy for this moment. This moment is your life.",
+        "author": "Omar Khayyam",
+        "category": "Life & Happiness"
+    },
+    {
+        "id": 70,
+        "quote": "Very little is needed to make a happy life; it is all within yourself, in your way of thinking.",
+        "author": "Marcus Aurelius",
+        "category": "Life & Happiness"
+    },
+    {
+        "id": 71,
+        "quote": "Count your age by friends, not years. Count your life by smiles, not tears.",
+        "author": "John Lennon",
+        "category": "Life & Happiness"
+    },
+    {
+        "id": 72,
+        "quote": "May you live all the days of your life.",
+        "author": "Jonathan Swift",
+        "category": "Life & Happiness"
+    },
+
+    # 73 - 82: Humor & Wit
+    {
+        "id": 73,
+        "quote": "The difference between stupidity and genius is that genius has its limits.",
+        "author": "Albert Einstein",
+        "category": "Humor & Wit"
+    },
+    {
+        "id": 74,
+        "quote": "I am so clever that sometimes I don't understand a single word of what I am saying.",
+        "author": "Oscar Wilde",
+        "category": "Humor & Wit"
+    },
+    {
+        "id": 75,
+        "quote": "Always remember that you are absolutely unique. Just like everyone else.",
+        "author": "Margaret Mead",
+        "category": "Humor & Wit"
+    },
+    {
+        "id": 76,
+        "quote": "If you think you are too small to make a difference, try sleeping with a mosquito.",
+        "author": "Dalai Lama",
+        "category": "Humor & Wit"
+    },
+    {
+        "id": 77,
+        "quote": "Never put off till tomorrow what may be done day after tomorrow just as well.",
+        "author": "Mark Twain",
+        "category": "Humor & Wit"
+    },
+    {
+        "id": 78,
+        "quote": "A day without sunshine is like, you know, night.",
+        "author": "Steve Martin",
+        "category": "Humor & Wit"
+    },
+    {
+        "id": 79,
+        "quote": "I refuse to join any club that would have me as a member.",
+        "author": "Groucho Marx",
+        "category": "Humor & Wit"
+    },
+    {
+        "id": 80,
+        "quote": "Behind every great man is a woman rolling her eyes.",
+        "author": "Jim Carrey",
+        "category": "Humor & Wit"
+    },
+    {
+        "id": 81,
+        "quote": "Better to remain silent and be thought a fool than to speak out and remove all doubt.",
+        "author": "Abraham Lincoln",
+        "category": "Humor & Wit"
+    },
+    {
+        "id": 82,
+        "quote": "I can resist everything except temptation.",
+        "author": "Oscar Wilde",
+        "category": "Humor & Wit"
+    },
+
+    # 83 - 91: Art & Creativity
+    {
+        "id": 83,
+        "quote": "Every child is an artist. The problem is how to remain an artist once we grow up.",
+        "author": "Pablo Picasso",
+        "category": "Art & Creativity"
+    },
+    {
+        "id": 84,
+        "quote": "Creativity is intelligence having fun.",
+        "author": "Albert Einstein",
+        "category": "Art & Creativity"
+    },
+    {
+        "id": 85,
+        "quote": "Art washes away from the soul the dust of everyday life.",
+        "author": "Pablo Picasso",
+        "category": "Art & Creativity"
+    },
+    {
+        "id": 86,
+        "quote": "Simplicity is the ultimate sophistication.",
+        "author": "Leonardo da Vinci",
+        "category": "Art & Creativity"
+    },
+    {
+        "id": 87,
+        "quote": "I dream my painting and I paint my dream.",
+        "author": "Vincent van Gogh",
+        "category": "Art & Creativity"
+    },
+    {
+        "id": 88,
+        "quote": "Creativity takes courage.",
+        "author": "Henri Matisse",
+        "category": "Art & Creativity"
+    },
+    {
+        "id": 89,
+        "quote": "Great things are done by a series of small things brought together.",
+        "author": "Vincent van Gogh",
+        "category": "Art & Creativity"
+    },
+    {
+        "id": 90,
+        "quote": "You can't use up creativity. The more you use, the more you have.",
+        "author": "Maya Angelou",
+        "category": "Art & Creativity"
+    },
+    {
+        "id": 91,
+        "quote": "To create one's own world in any of the arts takes courage.",
+        "author": "Georgia O'Keeffe",
+        "category": "Art & Creativity"
+    },
+
+    # 92 - 100: Leadership & Change
+    {
+        "id": 92,
+        "quote": "Be the change that you wish to see in the world.",
+        "author": "Mahatma Gandhi",
+        "category": "Leadership & Change"
+    },
+    {
+        "id": 93,
+        "quote": "In matters of style, swim with the current; in matters of principle, stand like a rock.",
+        "author": "Thomas Jefferson",
+        "category": "Leadership & Change"
+    },
+    {
+        "id": 94,
+        "quote": "A leader is one who knows the way, goes the way, and shows the way.",
+        "author": "John C. Maxwell",
+        "category": "Leadership & Change"
+    },
+    {
+        "id": 95,
+        "quote": "Change will not come if we wait for some other person or some other time. We are the ones we've been waiting for.",
+        "author": "Barack Obama",
+        "category": "Leadership & Change"
+    },
+    {
+        "id": 96,
+        "quote": "The supreme art of war is to subdue the enemy without fighting.",
+        "author": "Sun Tzu",
+        "category": "Leadership & Change"
+    },
+    {
+        "id": 97,
+        "quote": "The only limit to our realization of tomorrow will be our doubts of today.",
+        "author": "Franklin D. Roosevelt",
+        "category": "Leadership & Change"
+    },
+    {
+        "id": 98,
+        "quote": "If your actions inspire others to dream more, learn more, do more and become more, you are a leader.",
+        "author": "John Quincy Adams",
+        "category": "Leadership & Change"
+    },
+    {
+        "id": 99,
+        "quote": "Do not follow where the path may lead. Go instead where there is no path and leave a trail.",
+        "author": "Ralph Waldo Emerson",
+        "category": "Leadership & Change"
+    },
+    {
+        "id": 100,
+        "quote": "I alone cannot change the world, but I can cast a stone across the waters to create many ripples.",
+        "author": "Mother Teresa",
+        "category": "Leadership & Change"
+    }
+]
+
+os.makedirs("data", exist_ok=True)
+with open("data/quotes.json", "w", encoding="utf-8") as f:
+    json.dump(quotes, f, indent=2, ensure_ascii=False)
+
+print(f"Successfully generated {len(quotes)} quotes in data/quotes.json")
