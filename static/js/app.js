@@ -28,7 +28,15 @@ document.addEventListener("DOMContentLoaded", () => {
   const countShown = document.getElementById("count-shown");
   const countTotal = document.getElementById("count-total");
   const totalQuotesBadge = document.getElementById("total-quotes-badge");
+  const themeToggle = document.getElementById("theme-toggle");
   const toast = document.getElementById("toast");
+
+  // --- Theme State Initialization ---
+  const savedTheme = localStorage.getItem("quotevault_theme") || "dark";
+  if (savedTheme === "light") {
+    document.documentElement.setAttribute("data-theme", "light");
+    if (themeToggle) themeToggle.checked = true;
+  }
 
   // --- State ---
   let currentSpotlightQuote = null;
@@ -401,6 +409,21 @@ document.addEventListener("DOMContentLoaded", () => {
   // Export to CSV Button
   if (btnExportCsv) {
     btnExportCsv.addEventListener("click", exportToCSV);
+  }
+
+  // Theme Toggle (Dark / Light mode)
+  if (themeToggle) {
+    themeToggle.addEventListener("change", (e) => {
+      if (e.target.checked) {
+        document.documentElement.setAttribute("data-theme", "light");
+        localStorage.setItem("quotevault_theme", "light");
+        showToast("Switched to Light mode");
+      } else {
+        document.documentElement.removeAttribute("data-theme");
+        localStorage.setItem("quotevault_theme", "dark");
+        showToast("Switched to Dark mode");
+      }
+    });
   }
 
   // Quote Grid Interactions (Category tag click & Card copy button)
