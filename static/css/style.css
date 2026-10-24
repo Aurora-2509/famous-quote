@@ -471,6 +471,8 @@ body::before {
 .filter-actions {
   display: flex;
   align-items: flex-end;
+  gap: 10px;
+  flex-wrap: wrap;
 }
 
 /* Category Chips */
@@ -597,6 +599,18 @@ body::before {
 .btn-card-copy:hover {
   color: #ffffff;
   background: rgba(255, 255, 255, 0.08);
+}
+
+.btn-card-copy.copied {
+  color: #34d399 !important;
+  background: rgba(52, 211, 153, 0.15) !important;
+  border-color: rgba(52, 211, 153, 0.35) !important;
+}
+
+.btn.copied {
+  color: #34d399 !important;
+  border-color: rgba(52, 211, 153, 0.4) !important;
+  background: rgba(52, 211, 153, 0.15) !important;
 }
 
 .highlight {

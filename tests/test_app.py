@@ -118,3 +118,23 @@ def test_authors_endpoint(client):
     assert len(authors) > 0
     total_count = sum(a["count"] for a in authors)
     assert total_count == 100
+
+def test_export_csv_endpoint(client):
+    response = client.get("/api/quotes/export")
+    assert response.status_code == 200
+    assert "text/csv" in response.content_type
+    assert "attachment; filename=quotes.csv" in response.headers.get("Content-Disposition", "")
+    lines = response.data.decode("utf-8").strip().split("\r\n")
+    if len(lines) == 1:
+        lines = response.data.decode("utf-8").strip().split("\n")
+    assert lines[0] == '"ID","Quote","Author","Category"'
+    # Header + 100 quotes = 101 lines (ignoring embedded multiline quotes if any)
+    assert len(lines) >= 101
+
+def test_export_csv_filtered(client):
+    response = client.get("/api/quotes/export?author=Einstein")
+    assert response.status_code == 200
+    assert "text/csv" in response.content_type
+    content = response.data.decode("utf-8")
+    assert "Albert Einstein" in content
+    assert "Steve Jobs" not in content

@@ -21,6 +21,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const categoryChipsContainer = document.getElementById("category-chips");
   const btnResetFilters = document.getElementById("btn-reset-filters");
   const btnEmptyReset = document.getElementById("btn-empty-reset");
+  const btnExportCsv = document.getElementById("btn-export-csv");
 
   const quotesGrid = document.getElementById("quotes-grid");
   const emptyState = document.getElementById("empty-state");
@@ -197,16 +198,65 @@ document.addEventListener("DOMContentLoaded", () => {
     }, 2400);
   }
 
-  function copyToClipboard(text, author) {
+  function setButtonCopiedState(btn) {
+    if (!btn) return;
+    const originalHtml = btn.innerHTML;
+    btn.classList.add("copied");
+    btn.innerHTML = `
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+        <polyline points="20 6 9 17 4 12"/>
+      </svg>
+      <span>Copied!</span>
+    `;
+    setTimeout(() => {
+      btn.innerHTML = originalHtml;
+      btn.classList.remove("copied");
+    }, 1600);
+  }
+
+  function copyToClipboard(text, author, btn = null) {
     const formatted = `"${text}"\n— ${author}`;
+    const onCopied = () => {
+      showToast("Quote copied to clipboard!");
+      if (btn) setButtonCopiedState(btn);
+    };
+
     if (navigator.clipboard && navigator.clipboard.writeText) {
-      navigator.clipboard.writeText(formatted).then(() => {
-        showToast("Quote copied to clipboard!");
-      }).catch(() => {
+      navigator.clipboard.writeText(formatted).then(onCopied).catch(() => {
         fallbackCopy(formatted);
+        if (btn) setButtonCopiedState(btn);
       });
     } else {
       fallbackCopy(formatted);
+      if (btn) setButtonCopiedState(btn);
+    }
+  }
+
+  async function exportToCSV() {
+    const url = new URL("/api/quotes/export", window.location.origin);
+    if (activeSearchQuery) url.searchParams.set("q", activeSearchQuery);
+    if (activeCategory && activeCategory !== "all") url.searchParams.set("category", activeCategory);
+    if (activeAuthor && activeAuthor !== "all") url.searchParams.set("author", activeAuthor);
+
+    try {
+      showToast("Generating CSV export...");
+      const res = await fetch(url);
+      if (!res.ok) throw new Error("Export failed");
+      const blob = await res.blob();
+      const downloadUrl = window.URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = downloadUrl;
+      const count = countShown.textContent || "100";
+      const catSlug = activeCategory === "all" ? "all" : activeCategory.toLowerCase().replace(/[^a-z0-9]/g, "_");
+      a.download = `quotes_${catSlug}.csv`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      window.URL.revokeObjectURL(downloadUrl);
+      showToast(`Exported ${count} quotes to CSV!`);
+    } catch (err) {
+      console.error("Export error:", err);
+      showToast("Could not export CSV");
     }
   }
 
@@ -277,7 +327,7 @@ document.addEventListener("DOMContentLoaded", () => {
   // Copy Spotlight Quote
   btnCopySpotlight.addEventListener("click", () => {
     if (currentSpotlightQuote) {
-      copyToClipboard(currentSpotlightQuote.quote, currentSpotlightQuote.author);
+      copyToClipboard(currentSpotlightQuote.quote, currentSpotlightQuote.author, btnCopySpotlight);
     }
   });
 
@@ -348,13 +398,18 @@ document.addEventListener("DOMContentLoaded", () => {
   btnResetFilters.addEventListener("click", resetAllFilters);
   btnEmptyReset.addEventListener("click", resetAllFilters);
 
+  // Export to CSV Button
+  if (btnExportCsv) {
+    btnExportCsv.addEventListener("click", exportToCSV);
+  }
+
   // Quote Grid Interactions (Category tag click & Card copy button)
   quotesGrid.addEventListener("click", (e) => {
     const copyBtn = e.target.closest(".btn-card-copy");
     if (copyBtn) {
       const text = copyBtn.dataset.quote;
       const author = copyBtn.dataset.author;
-      copyToClipboard(text, author);
+      copyToClipboard(text, author, copyBtn);
       return;
     }
 
